@@ -1,3 +1,6 @@
+//ÈıÌìÇ°Ëü¾ÍÏñÎÒÇ×ÉúµÄÒ»Ñù
+//ÈıÌìºóÎÒ¾ÍÏñËûÇ×ÉúµÄÒ»Ñù
+
 #include "hge.h" 
 #include "hgeSprite.h"
 #include "hgeFont.h"
@@ -17,10 +20,11 @@ hgeFont *fnt;//¶¨Òå×ÖÌåÖ¸Õë,
 HTEXTURE tex1,tex2,tex3;//¶¨ÒåÒ»¸ötexture(ÎÆÀí)¶ÔÏó
 
 
+//²ÎÊıÉè¶¨
+int ScreenW=1280,ScreenH=720;    //·Ö±æÂÊ
+int speed=100;                   //³õÊ¼ËÙ¶ÈÉèÖÃ£¬¾ßÌåµÄËÙ¶È¼ÆËã·½Ê½Çë¼ûFrameFunc()
 
-int ScreenW=1280,ScreenH=720;
-int top=400;
-int speed=100;
+//ÂÒÆß°ËÔãÈ«¾Ö±äÁ¿¶¨ÒåÇø
 double rx,ry;
 float x[3]={0};
 float y[3]={0};
@@ -29,10 +33,12 @@ float distance2[3]={0};
 float start_x[3]={0},start_y[3]={0};
 bool flag=true;
 
+float dt=hge->Timer_GetDelta();//´ÓÉÏ´Î¿ªÊ¼äÖÈ¾µ½½áÊøäÖÈ¾ËùĞèÒªµÄÊ±¼ä£¬ÎªÁËÍ³Ò»²»Í¬ÅäÖÃµÄÔËĞĞËÙ¶È
+
 clock_t score;
 
 
-int CDECL MessageBoxPrintf (TCHAR * szCaption, TCHAR * szFormat, ...)
+int CDECL MessageBoxPrintf (TCHAR * szCaption, TCHAR * szFormat, ...)    //µ¯´°Ä£¿é¡£¡£ÓĞÊ²Ã´ÓÃÎÒÒ²²»ÖªµÀ£¬·´ÕıÕâÑù¾ÍÄÜÕı³£ÏÔÊ¾ÁË~²»¾À½á
 {
      TCHAR   szBuffer [1024] ;
      va_list pArgList ;
@@ -47,22 +53,21 @@ int CDECL MessageBoxPrintf (TCHAR * szCaption, TCHAR * szFormat, ...)
      return MessageBox (NULL, szBuffer, szCaption, 0|1) ;
 }
 
-void mian_ball()
+void mian_ball()//¸úËæÇòµÄÔË¶¯·½Ê½
 {
-	float dt=hge->Timer_GetDelta();
-	double xv,yv;
+	double xv,yv;//×ø±ê·ÖÏòÁ¿
 	xv=rx-mx;
 	yv=ry-my;
-	distance1=sqrt(pow(xv,2)+pow(yv,2));
-	xv /= distance1;
+	distance1=sqrt(pow(xv,2)+pow(yv,2));//Á½µã¼äµÄ¾àÀë¹«Ê½~
+	xv /= distance1;//ÆäÊµÎÒÊıÑ§²»ºÃ£¬ÉÏÃæÖ»ÊÇÂô¸öÃÈ
 	yv /= distance1;
-	xv *= speed*dt;
-	yv *= speed*dt;
+	xv *= speed*dt;//Í¬ÉÏ
+	yv *= speed*dt;//¸Ğ¾õ³ËÒ»¸ödtÊÇÎªÁËÍ³Ò»ËÙ¶È
 	rx -= xv;
-	ry -= yv;
+	ry -= yv;//¶÷£¬Éè¶¨ĞÂµÄ×ø±ê£¡
 }
 
-void three_ball()
+void three_ball()//ÕâÀïÊ²Ã´Ò²Ã»ÓĞ£¬ÔÙÔõÃ´¿´Ò²Ã»ÓĞ¡£
 {
 	float dt=hge->Timer_GetDelta();
 	int i;
@@ -77,11 +82,12 @@ bool RenderFunc()//»æÖÆº¯Êı£¬³ÌĞò¿ªÊ¼ºóHGE½«²»Í£µ÷ÓÃËü
 	int i;
 	hge->Gfx_BeginScene();//¿ªÊ¼äÖÈ¾ 
 	hge->Gfx_Clear(0xFF000000);//ÒÔÄ³ÑÕÉ«ÇåÆÁ£¬OxFF000000ÎªÍ¸Ã÷¶ÈÎª0µÄºÚÉ«
-	score = clock()/10;
-	fnt->SetColor(0xFF00FFFF); 
+	score = clock()/10;//ÉèÖÃ·ÖÊı
+	fnt->SetColor(0xFF00FFFF); //ÉèÖÃ×ÖÌåÑÕÉ«ÎªÄÇÊ²Ã´ÑÕÉ«
 	fnt->printf(5, 5, HGETEXT_LEFT, "SCORE:%u\nFPS:%d\nSPEED:%d",score,hge->Timer_GetFPS(),speed);
-	hge->Input_GetMousePos(&mx,&my);
-	if(mx<15)
+	hge->Input_GetMousePos(&mx,&my);//»ñÈ¡Êó±ê×ø±ê
+
+	if(mx<15) //ÎªÁË²»ÈÃ½¹µãÌùÍ¼ÅÜµ½´°¿ÚÍâÃæ£¬ĞŞÕıÊó±êµÄ×ø±ê
 		mx=15;
 	if(my<15)
 		my=15;
@@ -89,20 +95,24 @@ bool RenderFunc()//»æÖÆº¯Êı£¬³ÌĞò¿ªÊ¼ºóHGE½«²»Í£µ÷ÓÃËü
 		mx=ScreenW-15;
 	if(my>ScreenH-15)
 		my=ScreenH-15;
-	par->Render();
-	spr1->Render(mx,my);//ÔÚÖ¸¶¨Î»ÖÃÏÔÊ¾¾«Áé
-	spr2->Render(rx,ry);
-	for(i=1;i<=3;i++)
-		spr2->Render(x[i],y[i]);
+
+	par->Render();//¿ªÊ¼äÖÈ¾Á£×Ó
+	spr1->Render(mx,my);//ÔÚÊó±ê½¹µã´¦äÖÈ¾ÌùÍ¼
+	spr2->Render(rx,ry);//¿ªÊ¼äÖÈ¾¸úËæÇò
+
+	//for(i=1;i<=3;i++)//¿ªÊ¼äÖÈ¾Èı¸ö·´µ¯Çò
+		//spr2->Render(x[i],y[i]);
+
 	hge->Gfx_EndScene();//½áÊøäÖÈ¾ 
 	return false;//×ÜÊÇ·µ»Øfalse 
 } 
 
 bool FrameFunc()//Âß¼­º¯Êı£¬³ÌĞò¿ªÊ¼ºóHGE½«²»Í£µ÷ÓÃËü£¬Ò»Ğ©Âß¼­ÅĞ¶Ï»òÕß´¦Àí¿ÉÒÔĞ´ÔÚÕâÀï¡£ 
 { 
-	mian_ball();
-	three_ball();
-	if(score<=1000)
+	mian_ball();//µ÷ÓÃ¸úËæÇò
+	//three_ball();//µ÷ÓÃ·´µ¯Çò
+
+	if(score<=1000)//ËÙ¶È¼ÆËã£¬ÄÇ¸öÊıÑ§²»ºÃ£¬Ğ´³ÉÕâÑùÁË±ğ¹ÖÎÒ
 	{
 		speed=150;
 	}
@@ -118,11 +128,12 @@ bool FrameFunc()//Âß¼­º¯Êı£¬³ÌĞò¿ªÊ¼ºóHGE½«²»Í£µ÷ÓÃËü£¬Ò»Ğ©Âß¼­ÅĞ¶Ï»òÕß´¦Àí¿ÉÒÔĞ
 	{
 		speed=95+score*0.03;
 	}
-	float dt=hge->Timer_GetDelta();
-	par->info.nEmission=50;
-	par->MoveTo(mx,my);
-	par->Update(dt);
-	if(hge->Input_GetKeyState(HGEK_ESCAPE) || distance1<40)
+
+	par->info.nEmission=50;//Á£×ÓÉúÃüÖÜÆÚ
+	par->MoveTo(mx,my);//Á£×ÓÔË¶¯·½Ê½
+	par->Update(dt);//¸üĞÂÁ£×Ó
+
+	if(hge->Input_GetKeyState(HGEK_ESCAPE) || distance1<40)//ESC½áÊø
 	{
 		return true;
 	}else{
@@ -137,12 +148,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)//WinMainº¯Êı£¬³ÌĞòµÄÈë¿Ú¡£
 	srand((int)time(0));
 	int k;
 	hge=hgeCreate(HGE_VERSION);//Ê¹ÓÃhgeCreateº¯Êı´´½¨HGE½Ó¿Ú£¬²ÎÊı±ØĞë´«µİÕıÈ·µÄHGE_VERSION,ËüÊÇÔÚhge.hÖĞ¶¨ÒåµÄ 
-	hge->System_SetState(HGE_SCREENWIDTH,ScreenW);//½«ÆÁÄ»¿í¶ÈÉèÖÃÎª800 
-	hge->System_SetState(HGE_SCREENHEIGHT,ScreenH);//½«ÆÁÄ»¸ß¶ÈÉèÖÃÎª600 
+	hge->System_SetState(HGE_SCREENWIDTH,ScreenW);//ÉèÖÃÆÁÄ»¿í¶È
+	hge->System_SetState(HGE_SCREENHEIGHT,ScreenH);//ÉèÖÃÆÁÄ»¸ß¶È
 	hge->System_SetState(HGE_FRAMEFUNC, FrameFunc);//ÉèÖÃÂß¼­º¯ÊıÎªFrameFuncº¯Êı 
 	hge->System_SetState(HGE_RENDERFUNC,RenderFunc);//ÉèÖÃ»æÖÆº¯ÊıÎªRenderFuncº¯Êı 
-	hge->System_SetState(HGE_FPS, 100);
-	hge->System_SetState(HGE_TITLE, "µ°ÌÛ¢áºÅ");//ÉèÖÃ´°¿Ú±êÌâÎª¡°ÏÔÊ¾Í¼Ïñ¡± 
+	hge->System_SetState(HGE_FPS, 100);//ÉèÖÃ×î´óFPSÎª100
+	hge->System_SetState(HGE_TITLE, "µ°ÌÛ¢áºÅ");//ÉèÖÃ´°¿Ú±êÌâ 
 	hge->System_SetState(HGE_WINDOWED,true);//ÉèÖÃÊ¹ÓÃ´°¿ÚÄ£Ê½ 
 	hge->System_SetState(HGE_USESOUND,false);//ÉèÖÃ²»Ê¹ÓÃÉùÒô£¨µÚ¶ş¸ö³ÌĞòÎÒÃÇÏÈ²»½²½âÉùÒôµÄÖªÊ¶£©
 	hge->System_SetState(HGE_SHOWSPLASH, false);
@@ -153,24 +164,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)//WinMainº¯Êı£¬³ÌĞòµÄÈë¿Ú¡£
 		tex3=hge->Texture_Load("particles.png");
 		if(tex1 && tex2)
 		{//¼ì²âÊÇ·ñÍ¼Æ¬³É¹¦ÔØÈë 
-			spr1=new hgeSprite(tex1,0,0,30,30);//³õÊ¼»¯¾«Áéspr£¬²¢ÇÒÖ¸¶¨texÎªËüµÄÎÆÀí 
-			spr1->SetHotSpot(16,16);
-			spr2=new hgeSprite(tex2,0,0,50,50);//³õÊ¼»¯¾«Áéspr£¬²¢ÇÒÖ¸¶¨texÎªËüµÄÎÆÀí 
-			spr2->SetHotSpot(25,25);
-			spr3=new hgeSprite(tex3,32,32,32,32);
-			spr3->SetHotSpot(16,16);
-			par=new hgeParticleSystem("trail.psi",spr3);
-			par->Fire();
-			fnt = new hgeFont("font1.fnt");
-			rx=rand()%ScreenW-25;
+			spr1=new hgeSprite(tex1,0,0,30,30);//³õÊ¼»¯¾«Áé£¨Êó±ê£©
+			spr1->SetHotSpot(16,16);//½«½¹µãÉè¶¨ÎªÖĞĞÄ
+			spr2=new hgeSprite(tex2,0,0,50,50);//³õÊ¼»¯¾«Áé£¨Çò£©
+			spr2->SetHotSpot(25,25);//½«½¹µãÉè¶¨ÎªÖĞĞÄ
+			spr3=new hgeSprite(tex3,32,32,32,32);////³õÊ¼»¯¾«Áé£¨Á£×Ó£©
+			spr3->SetHotSpot(16,16);//½«½¹µãÉè¶¨ÎªÖĞĞÄ
+			par=new hgeParticleSystem("trail.psi",spr3);//³õÊ¼»¯Á£×Ó£¬Ê¹ÓÃ¾«Áéspr3
+			par->Fire();//Éè¶¨Á£×Ó·¢ÉäÄ£Ê½
+			fnt = new hgeFont("font1.fnt");//³õÊ¼»¯ÎÄ×Ö
+
+			//³õÊ¼»¯Èı¸ö·´µ¯ÇòµÄ×ø±ê
+			rx=rand()%ScreenW-25;//±ÜÃâÉú³ÉÔÚ´°¿ÚÍâ
 			ry=rand()%ScreenH-25;
 			for(k=1;k<=3;k++)
 			{
-				x[k]=rand()%ScreenW-25;
+				x[k]=rand()%ScreenW-25;//Ëæ»úÊı²»½âÊÍÁË
 				y[k]=rand()%ScreenH-25;
 				start_x[k]=rand()%ScreenW-50;
 				start_y[k]=rand()%ScreenH-50;
-				if(x[k]<25)
+
+				if(x[k]<25)//±ÜÃâÉú³ÉÔÚ´°¿ÚÍâ
 				{
 					x[k]=25;
 					start_x[k];
@@ -192,14 +206,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)//WinMainº¯Êı£¬³ÌĞòµÄÈë¿Ú¡£
 				}
 			}
 			hge->System_Start();//Èç¹ûÃ»ÓĞÎÊÌâ£¬ÔòÊ¹ÓÃSystem_Start·½·¨£¬¿ªÊ¼³ÌĞò¡£
-			MessageBoxPrintf (TEXT ("Game Over"), TEXT ("ÄãµÄ·ÖÊıÊÇ£º%u"),score) ;
+			MessageBoxPrintf (TEXT ("Game Over"), TEXT ("ÄãµÄ·ÖÊıÊÇ£º%u"),score) ;//ÓÎÏ·½áÊøÊä³ö·ÖÊı
 		}
 	} 
 	hge->Texture_Free(tex1);//ÊÍ·ÅÎÆÀí 
 	hge->Texture_Free(tex2);//ÊÍ·ÅÎÆÀí 
 	delete spr1;//ÊÍ·Å¾«Áé 
     delete spr2;
-	delete fnt;
+	delete spr3;
+	delete par;//ÊÍ·ÅÁ£×Ó
+	delete fnt;//ÊÍ·ÅÎÄ×Ö
 	hge->System_Shutdown();//³ÌĞòÍ£Ö¹ 
 	hge->Release();//ÊÍ·ÅHGEËùÕ¼ÓÃµÄÄÚ´æ¡£ 
 	return 0;
