@@ -17,6 +17,7 @@ hgeSprite *spr1,*spr2,*spr3;//创建精灵类指针
 hgeParticleSystem *par;
 hgeFont *fnt;//定义字体指针,
 HTEXTURE tex1,tex2,tex3;//定义一个texture(纹理)对象
+HEFFECT	snd;
 
 
 //参数设定
@@ -81,10 +82,12 @@ void three_ball()//这里什么也没有，再怎么看也没有。
 		if(x[i]<25 || x[i]>ScreenW-25)//反弹处理
 		{
 			speed_dirx[i]=-speed_dirx[i];
+			hge->Effect_Play(snd);
 		}
 		if(y[i]<25 ||y[i]>ScreenH-25)
 		{
 			speed_diry[i]=-speed_diry[i];
+			hge->Effect_Play(snd);
 		}
 	}
 }
@@ -116,7 +119,6 @@ bool RenderFunc()//绘制函数，程序开始后HGE将不停调用它
 
 	for(i=1;i<=3;i++)//开始渲染三个反弹球
 		spr2->Render(x[i],y[i]);
-
 	hge->Gfx_EndScene();//结束渲染 
 	return false;//总是返回false 
 } 
@@ -144,7 +146,7 @@ bool FrameFunc()//逻辑函数，程序开始后HGE将不停调用它，一些�
 		speed=95+score*0.03;
 	}
 
-	par->info.nEmission=50;//粒子生命周期
+	par->info.nEmission=150;//粒子生命周期
 	par->MoveTo(mx,my);//粒子运动方式
 	par->Update(dt);//更新粒子
 
@@ -162,32 +164,38 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)//WinMain函数，程序的�
 { 
 	srand((int)time(0));
 	int k;
-	hge=hgeCreate(HGE_VERSION);//使用hgeCreate函数创建HGE接口，参数必须传递正确的HGE_VERSION,它是在hge.h中定义的 
+	hge=hgeCreate(HGE_VERSION);//使用hgeCreate函数创建HGE接口
 	hge->System_SetState(HGE_SCREENWIDTH,ScreenW);//设置屏幕宽度
 	hge->System_SetState(HGE_SCREENHEIGHT,ScreenH);//设置屏幕高度
 	hge->System_SetState(HGE_FRAMEFUNC, FrameFunc);//设置逻辑函数为FrameFunc函数 
 	hge->System_SetState(HGE_RENDERFUNC,RenderFunc);//设置绘制函数为RenderFunc函数 
+	hge->System_SetState(HGE_ZBUFFER,true); //打开Z-Buffer
 	hge->System_SetState(HGE_FPS, 100);//设置最大FPS为100
 	hge->System_SetState(HGE_TITLE, "蛋疼⑨号");//设置窗口标题 
 	hge->System_SetState(HGE_WINDOWED,true);//设置使用窗口模式 
-	hge->System_SetState(HGE_USESOUND,false);//设置不使用声音（第二个程序我们先不讲解声音的知识）
+	hge->System_SetState(HGE_USESOUND,true);//设置使用声音
 	hge->System_SetState(HGE_SHOWSPLASH, false);
 	if(hge->System_Initiate())//用hge类的System_Initiate()方法，检测初始化是否有错误出现。 
 	{ 
-		tex1=hge->Texture_Load("./resources/cursow.png");//根据路径载入图片 
+		tex1=hge->Texture_Load("./resources/cursor.png");//根据路径载入图片 
 		tex2=hge->Texture_Load("./resources/ball.png");
 		tex3=hge->Texture_Load("./resources/a.png");
-		if(tex1 && tex2 && tex3)
+		snd=hge->Effect_Load("./resources/hit.wav");
+		if(tex1 && tex2 && tex3 && snd)
 		{//检测是否图片成功载入 
 			spr1=new hgeSprite(tex1,0,0,30,30);//初始化精灵（鼠标）
 			spr1->SetHotSpot(16,16);//将焦点设定为中心
+			spr1->SetZ(0.1);
 			spr2=new hgeSprite(tex2,0,0,50,50);//初始化精灵（球）
 			spr2->SetHotSpot(25,25);//将焦点设定为中心
+			spr2->SetZ(0.1);
 			spr3=new hgeSprite(tex3,32,32,32,32);////初始化精灵（粒子）
 			spr3->SetHotSpot(16,16);//将焦点设定为中心
+			spr3->SetZ(0.1);
 			par=new hgeParticleSystem("./resources/a.psi",spr3);//初始化粒子，使用精灵spr3
 			par->Fire();//设定粒子发射模式
 			fnt = new hgeFont("./resources/font.fnt");//初始化文字
+			fnt->SetZ(0.2);
 
 			//初始化三个反弹球的坐标，及运动方向
 			rx=rand()%ScreenW-25;//避免生成在窗口外
