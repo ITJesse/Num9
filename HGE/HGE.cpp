@@ -12,7 +12,6 @@
 #include "StdAfx.h"
 #include <tchar.h> 
 
-
 HGE *hge=0;//创建HGE指针 
 hgeSprite *spr1,*spr2,*spr3;//创建精灵类指针 
 hgeParticleSystem *par;
@@ -32,8 +31,6 @@ float mx,my,distance1;
 float distance2[3]={0};
 float start_x[3]={0},start_y[3]={0};
 bool flag=true;
-
-float dt=hge->Timer_GetDelta();//从上次开始渲染到结束渲染所需要的时间，为了统一不同配置的运行速度
 
 clock_t score;
 
@@ -55,6 +52,7 @@ int CDECL MessageBoxPrintf (TCHAR * szCaption, TCHAR * szFormat, ...)    //弹�
 
 void mian_ball()//跟随球的运动方式
 {
+	float dt=hge->Timer_GetDelta();//从上次开始渲染到结束渲染所需要的时间，为了统一不同配置的运行速度
 	double xv,yv;//坐标分向量
 	xv=rx-mx;
 	yv=ry-my;
@@ -69,7 +67,7 @@ void mian_ball()//跟随球的运动方式
 
 void three_ball()//这里什么也没有，再怎么看也没有。
 {
-	float dt=hge->Timer_GetDelta();
+	float dt=hge->Timer_GetDelta();//从上次开始渲染到结束渲染所需要的时间，为了统一不同配置的运行速度
 	int i;
 	double start_xv,start_yv,stepxv,stepyv;
 
@@ -79,7 +77,6 @@ void three_ball()//这里什么也没有，再怎么看也没有。
 
 bool RenderFunc()//绘制函数，程序开始后HGE将不停调用它 
 { 
-	int i;
 	hge->Gfx_BeginScene();//开始渲染 
 	hge->Gfx_Clear(0xFF000000);//以某颜色清屏，OxFF000000为透明度为0的黑色
 	score = clock()/10;//设置分数
@@ -109,6 +106,7 @@ bool RenderFunc()//绘制函数，程序开始后HGE将不停调用它
 
 bool FrameFunc()//逻辑函数，程序开始后HGE将不停调用它，一些逻辑判断或者处理可以写在这里。 
 { 
+	float dt=hge->Timer_GetDelta();//从上次开始渲染到结束渲染所需要的时间，为了统一不同配置的运行速度
 	mian_ball();//调用跟随球
 	//three_ball();//调用反弹球
 
