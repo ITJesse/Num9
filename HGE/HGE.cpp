@@ -174,10 +174,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)//WinMain函数，程序的�
 	hge->System_SetState(HGE_SHOWSPLASH, false);
 	if(hge->System_Initiate())//用hge类的System_Initiate()方法，检测初始化是否有错误出现。 
 	{ 
-		tex1=hge->Texture_Load("1.png");//根据路径载入图片 
-		tex2=hge->Texture_Load("2.png");
-		tex3=hge->Texture_Load("particles.png");
-		if(tex1 && tex2)
+		tex1=hge->Texture_Load("./resources/cursow.png");//根据路径载入图片 
+		tex2=hge->Texture_Load("./resources/ball.png");
+		tex3=hge->Texture_Load("./resources/a.png");
+		if(tex1 && tex2 && tex3)
 		{//检测是否图片成功载入 
 			spr1=new hgeSprite(tex1,0,0,30,30);//初始化精灵（鼠标）
 			spr1->SetHotSpot(16,16);//将焦点设定为中心
@@ -185,9 +185,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)//WinMain函数，程序的�
 			spr2->SetHotSpot(25,25);//将焦点设定为中心
 			spr3=new hgeSprite(tex3,32,32,32,32);////初始化精灵（粒子）
 			spr3->SetHotSpot(16,16);//将焦点设定为中心
-			par=new hgeParticleSystem("trail.psi",spr3);//初始化粒子，使用精灵spr3
+			par=new hgeParticleSystem("./resources/a.psi",spr3);//初始化粒子，使用精灵spr3
 			par->Fire();//设定粒子发射模式
-			fnt = new hgeFont("font1.fnt");//初始化文字
+			fnt = new hgeFont("./resources/font.fnt");//初始化文字
 
 			//初始化三个反弹球的坐标，及运动方向
 			rx=rand()%ScreenW-25;//避免生成在窗口外
