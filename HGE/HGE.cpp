@@ -1,4 +1,4 @@
-//三天前它就像我亲生的一样
+﻿//三天前它就像我亲生的一样
 //三天后我就像他亲生的一样
 
 #include "hge.h" 
@@ -21,15 +21,16 @@ HTEXTURE tex1,tex2,tex3;//定义一个texture(纹理)对象
 
 //参数设定
 int ScreenW=1280,ScreenH=720;    //分辨率
-int speed=100;                   //初始速度设置，具体的速度计算方式请见FrameFunc()
+double speed=100;                   //初始速度设置，具体的速度计算方式请见FrameFunc()
 
 //乱七八糟全局变量定义区
 double rx,ry;
 float x[3]={0};
 float y[3]={0};
-float mx,my,distance1;
+float mx,my;
+double distance1;
 float distance2[3]={0};
-float start_x[3]={0},start_y[3]={0};
+float speed_dirx[3]={0},speed_diry[3]={0};
 bool flag=true;
 
 clock_t score;
@@ -68,20 +69,36 @@ void mian_ball()//跟随球的运动方式
 void three_ball()//这里什么也没有，再怎么看也没有。
 {
 	float dt=hge->Timer_GetDelta();//从上次开始渲染到结束渲染所需要的时间，为了统一不同配置的运行速度
+	double speedx,speedy;
 	int i;
-	double start_xv,start_yv,stepxv,stepyv;
-
+	for(i=1;i<=3;i++)
+	{
+		speedx=speed*0.707107*speed_dirx[i]*dt;
+		speedy=speed*0.707107*speed_diry[i]*dt;
+		x[i] += speedx;
+		y[i] += speedy;
+		distance2[i]=sqrt(pow((x[i]-mx),2)+pow((y[i]-my),2));
+		if(x[i]<25 || x[i]>ScreenW-25)//反弹处理
+		{
+			speed_dirx[i]=-speed_dirx[i];
+		}
+		if(y[i]<25 ||y[i]>ScreenH-25)
+		{
+			speed_diry[i]=-speed_diry[i];
+		}
+	}
 }
 
 
 
 bool RenderFunc()//绘制函数，程序开始后HGE将不停调用它 
 { 
+	int i;
 	hge->Gfx_BeginScene();//开始渲染 
 	hge->Gfx_Clear(0xFF000000);//以某颜色清屏，OxFF000000为透明度为0的黑色
 	score = clock()/10;//设置分数
 	fnt->SetColor(0xFF00FFFF); //设置字体颜色为那什么颜色
-	fnt->printf(5, 5, HGETEXT_LEFT, "SCORE:%u\nFPS:%d\nSPEED:%d",score,hge->Timer_GetFPS(),speed);
+	fnt->printf(5, 5, HGETEXT_LEFT, "SCORE:%u\nFPS:%d\nSPEED:%.0f",score,hge->Timer_GetFPS(),speed);
 	hge->Input_GetMousePos(&mx,&my);//获取鼠标坐标
 
 	if(mx<15) //为了不让焦点贴图跑到窗口外面，修正鼠标的坐标
@@ -97,8 +114,8 @@ bool RenderFunc()//绘制函数，程序开始后HGE将不停调用它
 	spr1->Render(mx,my);//在鼠标焦点处渲染贴图
 	spr2->Render(rx,ry);//开始渲染跟随球
 
-	//for(i=1;i<=3;i++)//开始渲染三个反弹球
-		//spr2->Render(x[i],y[i]);
+	for(i=1;i<=3;i++)//开始渲染三个反弹球
+		spr2->Render(x[i],y[i]);
 
 	hge->Gfx_EndScene();//结束渲染 
 	return false;//总是返回false 
@@ -108,7 +125,7 @@ bool FrameFunc()//逻辑函数，程序开始后HGE将不停调用它，一些�
 { 
 	float dt=hge->Timer_GetDelta();//从上次开始渲染到结束渲染所需要的时间，为了统一不同配置的运行速度
 	mian_ball();//调用跟随球
-	//three_ball();//调用反弹球
+	three_ball();//调用反弹球
 
 	if(score<=1000)//速度计算，那个数学不好，写成这样了别怪我
 	{
@@ -131,7 +148,7 @@ bool FrameFunc()//逻辑函数，程序开始后HGE将不停调用它，一些�
 	par->MoveTo(mx,my);//粒子运动方式
 	par->Update(dt);//更新粒子
 
-	if(hge->Input_GetKeyState(HGEK_ESCAPE) || distance1<40)//ESC结束
+	if(hge->Input_GetKeyState(HGEK_ESCAPE) || distance1<40 || distance2[1]<40 || distance2[2]<40 || distance2[3]<40)//ESC结束,撞球结束
 	{
 		return true;
 	}else{
@@ -172,35 +189,33 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)//WinMain函数，程序的�
 			par->Fire();//设定粒子发射模式
 			fnt = new hgeFont("font1.fnt");//初始化文字
 
-			//初始化三个反弹球的坐标
+			//初始化三个反弹球的坐标，及运动方向
 			rx=rand()%ScreenW-25;//避免生成在窗口外
 			ry=rand()%ScreenH-25;
 			for(k=1;k<=3;k++)
 			{
 				x[k]=rand()%ScreenW-25;//随机数不解释了
 				y[k]=rand()%ScreenH-25;
-				start_x[k]=rand()%ScreenW-50;
-				start_y[k]=rand()%ScreenH-50;
-
+				while(!speed_dirx[k] || !speed_diry[k])//随机的方向
+				{
+					speed_dirx[k]=rand()%3-1;
+					speed_diry[k]=rand()%3-1;
+				}
 				if(x[k]<25)//避免生成在窗口外
 				{
 					x[k]=25;
-					start_x[k];
 				}
-				if(y[k]<15)
+				if(y[k]<25)
 				{
 					y[k]=25;
-					start_y[k];
 				}
 				if(x[k]>ScreenW-25)
 				{
 					x[k]=ScreenW-25;
-					start_x[k];
 				}
 				if(y[k]>ScreenH-25)
 				{
 					y[k]=ScreenH-25;
-					start_y[k];
 				}
 			}
 			hge->System_Start();//如果没有问题，则使用System_Start方法，开始程序。
